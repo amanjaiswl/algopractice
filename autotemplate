@@ -1,0 +1,48 @@
+#!/bin/bash
+
+# Directory to monitor
+DIR="/home/aman/cp"
+
+# Template to populate .cpp files
+TEMPLATE="#include <iostream>
+#include <vector>
+#include <string>
+#include <algorithm>
+#include <cmath>
+
+using namespace std;
+
+#define ll long long
+
+void solve(){
+
+}
+
+int main(){
+  int t;
+  cin >> t;
+  while (t--){
+    solve();
+  }
+  return 0;
+}
+"
+
+# Function to populate .cpp file with template
+populate_template() {
+    if [[ $1 == *.cpp ]]; then
+        echo "$TEMPLATE" > "$1"
+        echo "Populated $1 with the template."
+    fi
+}
+
+# Export the function so it can be used by inotifywait
+export -f populate_template
+export TEMPLATE
+
+# Monitor the directory for new .cpp files and populate them with the template
+inotifywait -m -r -e create --format "%w%f" "$DIR" | while read NEWFILE
+do
+    populate_template "$NEWFILE"
+done
+
